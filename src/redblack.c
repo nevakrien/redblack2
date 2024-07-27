@@ -1,5 +1,6 @@
 #include "redblack.h"
 #include "utils.h"
+#include "debug.h"
 
 static void insert_fixup(RBTree* tree,Node* node){
 	while(node->parent->color=='R'){
@@ -68,9 +69,10 @@ Node* insert_node(RBTree* tree,Data d){
 	Node* cur = tree->root;
 	
 
+
 	while(1){
 		CMP c = compare(node->data,cur->data);
-		if(c){
+		if(c>=0){
 			if(cur->right->is_nil){
 				cur->right=node;
 				node->parent=cur;

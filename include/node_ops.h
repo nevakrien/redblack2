@@ -36,7 +36,9 @@ static inline Node* max_node(Node* node) {
     return node;
 }
 
+#include "debug.h"
 static inline void left_rotate(RBTree* tree, Node* x) {
+    ASSERT(!x->right->is_nil);
     Node* y = x->right;
     x->right = y->left;
     if (!y->left->is_nil) {
@@ -55,6 +57,7 @@ static inline void left_rotate(RBTree* tree, Node* x) {
 }
 
 static inline void right_rotate(RBTree* tree,Node* y) {
+    ASSERT(!y->left->is_nil);
     Node* x = y->left;
     y->left = x->right;
     if (! x->right->is_nil) {

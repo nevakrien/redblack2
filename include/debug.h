@@ -5,9 +5,32 @@
 #include "stdbool.h"
 #include <stdio.h>
 
+// static inline void verify_binary(Node* node){
+// 	if(!node->left->is_nil){
+// 		ASSERT(compare(node->data,node->left->data)>=0);
+// 		verify_binary(node->left);
+// 	}
+// 	if(!node->right->is_nil){
+// 		ASSERT(compare(node->right->data,node->data)>=0);
+// 		verify_binary(node->right);
+// 	}
+// 	// printf("checked\n");
+// }
+
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
+static void print_with_color_and_indent(const char* text, const char* color, int indent) {
+    for (int i = 0; i < indent; ++i) {
+    	printf("        ");
+    }
+    printf("%s%s%s", color, text, ANSI_COLOR_RESET);
+}
+
 static void print_with_indent(const char* text, int indent) {
     for (int i = 0; i < indent; ++i) {
-        printf("        "); // 4 spaces for each indent level
+        printf("        ");
     }
     printf(text);
 }
@@ -48,10 +71,14 @@ static int scan_node(Node* node,bool print,int indent){
 
 	if(!node->right->is_nil){
 		ASSERT(node == node->right->parent);
+		CMP c=compare(node->right->data,node->data);
+		ASSERT(c>=0);
 	}
 
 	if(!node->left->is_nil){
 		ASSERT(node == node->left->parent);
+		CMP c=compare(node->left->data,node->data);
+		ASSERT(c<=0);
 	}
 
 	int left = scan_node(node->left,print,indent+1);
@@ -67,16 +94,7 @@ static int scan_node(Node* node,bool print,int indent){
 }
 
 //GPT
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_RESET "\x1b[0m"
 
-static void print_with_color_and_indent(const char* text, const char* color, int indent) {
-    for (int i = 0; i < indent; ++i) {
-        printf("    "); // 4 spaces for each indent level
-    }
-    printf("%s%s%s", color, text, ANSI_COLOR_RESET);
-}
 
 static int check_and_pretty_print_node(Node* node, int indent) {
     if (node->is_nil) {
@@ -114,7 +132,7 @@ static int check_and_pretty_print_node(Node* node, int indent) {
         failed = true;
     }
 
-    int left = check_and_pretty_print_node(node->left, indent + 1);
+	int right = check_and_pretty_print_node(node->right, indent + 1);	    
 
     if (failed) {
         print_with_color_and_indent(color, ANSI_COLOR_RED, indent);
@@ -123,7 +141,9 @@ static int check_and_pretty_print_node(Node* node, int indent) {
     }
     printf("[%d]\n", node->data);
 
-    int right = check_and_pretty_print_node(node->right, indent + 1);
+    int left = check_and_pretty_print_node(node->left, indent + 1);
+
+    
 
     if (left != right) {
         failed = true;
