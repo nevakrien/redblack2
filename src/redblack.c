@@ -133,16 +133,62 @@ static void delete_fixup(RBTree* tree,Node* node){
 		// 	node=node->parent;
 		// 	continue;
 		// }
+		if(s->color=='R'){
+			//!printf("red sibling\n");
+			p->color='R';
+			s->color='B';
+			if(s==p->left){
+				right_rotate(tree,p);
+			}
+			else{
+				left_rotate(tree,p);
+			}
+			continue;
+			// //we just need s to be the new parent
+			// if(s==p->right){
+			// 	left_rotate(tree,p);
+			// 	if(!p->left->is_nil){
+			// 		p->left->color='R';
+			// 		p->color='B';
+			// 		return;
+			// 	}
+			// 	else{
+			// 		ASSERT(!p->right->is_nil);
+			// 		p->right->color='R';
+			// 		p->color='B';
+			// 		return;
+
+			// 	}
+				
+			// }
+			// //we just need s to be the new parent
+			// if(s==p->left){
+			// 	right_rotate(tree,p);
+			// 	if(!p->left->is_nil){
+			// 		p->left->color='R';
+			// 		p->color='B';
+			// 		return;
+			// 	}
+			// 	else{
+			// 		ASSERT(!p->right->is_nil);
+			// 		p->right->color='R';
+			// 		p->color='B';
+			// 		return;
+
+			// 	}
+				
+			// }	
+		}
 
 		if(s->color=='B' && (s->left->color=='R' || s->right->color=='R')){
-			printf("black sibling with red child:\n");
+			//!printf("black sibling with red child:\n");
 			
 
 			//siblings children are either nil or red
 
 			if(s==p->right && s->right->color=='R'){
 				//this has a BUG
-				s->right->color=s->color;
+				s->right->color='B';
 				s->color=p->color;
 				p->color='B';
 				left_rotate(tree,p);
@@ -152,7 +198,7 @@ static void delete_fixup(RBTree* tree,Node* node){
 
 			if(s==p->left && s->left->color=='R'){
 				//this has a BUG
-				s->left->color=s->color;
+				s->left->color='B';
 				s->color=p->color;
 				p->color='B';
 				right_rotate(tree,p);
@@ -161,43 +207,30 @@ static void delete_fixup(RBTree* tree,Node* node){
 				return;
 			}
 
-			printf("complex case\n");
+			//!printf("complex case\n");
 			//siblings kid is oposite side to us
 
 			if(s==p->right && s->left->color=='R'){
-				s->left->color='B';
+				s->left->color=p->color;
 				
 				right_rotate(tree,s);
 				left_rotate(tree,p);
-				goto parent_check;
+				p->color='B';
+				return;
 			}
 
 			if(s==p->left && s->right->color=='R'){
-				s->right->color='B';
-
-				
+				s->right->color=p->color;
 				left_rotate(tree,s);
 				right_rotate(tree,p);
-				
-			parent_check:
-				if(p->color=='R'){
-					p->color='B';
-					if(!p->parent->is_nil){
-						p->parent->color='R';
-					}
-					return;
-				}
-				else{
-					node=p;
-					continue;
-				}
+				p->color='B';
+				return;
 			}
-
-			// UNREACHABLE();
+			UNREACHABLE();
 		}
 
 		if(s->color=='B'){
-			printf("black sibling no children\n");
+			//!printf("black sibling no children\n");
 			// UNREACHABLE();
 			//now we know both children are black ie nil
 			s->color='R';
@@ -205,43 +238,7 @@ static void delete_fixup(RBTree* tree,Node* node){
 			continue;
 		}
 
-		if(s->color=='R'){
-			printf("red sibling\n");
-			//we just need s to be the new parent
-			if(s==p->right){
-				left_rotate(tree,p);
-				if(!p->left->is_nil){
-					p->left->color='R';
-					p->color='B';
-					return;
-				}
-				else{
-					ASSERT(!p->right->is_nil);
-					p->right->color='R';
-					p->color='B';
-					return;
 
-				}
-				
-			}
-			//we just need s to be the new parent
-			if(s==p->left){
-				right_rotate(tree,p);
-				if(!p->left->is_nil){
-					p->left->color='R';
-					p->color='B';
-					return;
-				}
-				else{
-					ASSERT(!p->right->is_nil);
-					p->right->color='R';
-					p->color='B';
-					return;
-
-				}
-				
-			}	
-		}
 
 		UNREACHABLE();
 	}
@@ -275,7 +272,7 @@ void delete_node(RBTree* tree,Node* node){
 	if((!node->right->is_nil) && (!node->left->is_nil)){
 		
 		Node* s = successor(node);
-		printf("2 kids (suc is %d)\n",s->data);
+		//!printf("2 kids (suc is %d)\n",s->data);
 
 		memcpy(&(node->data), &(s->data), sizeof(Data));
 		node=s;
@@ -286,7 +283,7 @@ void delete_node(RBTree* tree,Node* node){
 
 	Node* child = node->left->is_nil ? node->right : node->left;
 	if(!child->is_nil){
-		printf("1 kid (%d)\n",child->data);
+		//!printf("1 kid (%d)\n",child->data);
 		//since the other child is nil our child MUST be red thus we are black
 		ASSERT('R'==child->color && 'B'==node->color);
 
@@ -296,12 +293,12 @@ void delete_node(RBTree* tree,Node* node){
 	}
 	else{
 		if(node->color=='R' || node->parent->is_nil){
-			printf("red node or root\n");
+			//!printf("red node or root\n");
 			replace_for_parent(tree,node,node->left);//node at left is nil
 			
 		}
 		else{
-			printf("black node\n");
+			//!printf("black node\n");
 			node->is_nil=true;
 			delete_fixup(tree,node);
 			replace_for_parent(tree,node,node->left);//node at left is nil

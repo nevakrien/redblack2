@@ -7,7 +7,7 @@
 #include <errno.h>
 
 //user optional definitions
-#define CHECK_UNREACHABLE //puts an assert instead of ub 
+// #define CHECK_UNREACHABLE //puts an assert instead of ub 
 
 
 #if defined(CHECK_UNREACHABLE)

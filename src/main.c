@@ -43,34 +43,90 @@ void test_delete(){
 
 			Node* del_node=search_node(tree.root,sentinal);
 			assert(!(del_node->is_nil));
-			printf("[%d][%d]sentinal(%d) inserted\n",i,k,sentinal);
+			// printf("[%d][%d]sentinal(%d) inserted\n",i,k,sentinal);
 			fflush(stdout);
 
 			scan_node(tree.root,false,0);
 
 			// Node* g=del_node->parent->parent;
-			if(k==2){//2
-				printf("Before:\n");
-				check_and_pretty_print_node(tree.root,0);
-				for(int l=0;l<10;l++){putchar('\n');}
-			}
+			// if(k==2){//2
+			// 	printf("Before:\n");
+			// 	check_and_pretty_print_node(tree.root,0);
+			// 	for(int l=0;l<10;l++){putchar('\n');}
+			// }
 
 			delete_node(&tree,del_node);
 			assert(search_node(tree.root,sentinal)->is_nil);
-			printf("[%d][%d]sentinal(%d) removed\n",i,k,sentinal);
+			// printf("[%d][%d]sentinal(%d) removed\n",i,k,sentinal);
 			
-			if(k==2){
-				printf("After:\n");
-				check_and_pretty_print_node(tree.root,0);
-			}
+			// if(k==2){
+			// 	printf("After:\n");
+			// 	check_and_pretty_print_node(tree.root,0);
+			// }
 
-			fflush(stdout);
+			// fflush(stdout);
 
 			scan_node(tree.root,false,0);
 		}
 
 		scan_node(tree.root,false,0);
 		dinit_tree(&tree);
+	}
+}
+
+void shuffle_array(int *array, int n) {
+    if (n > 1) {
+        for (int i = 0; i < n - 1; i++) {
+            int j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
+    }
+}
+
+void test_random_delete() {
+    printf("testing random delete\n");
+    RBTree tree;
+    int num_elements = 100;
+    int elements[num_elements];
+
+    for(int i=0;i<100;i++){
+    	init_tree(&tree);
+	    // Insert random elements into the tree
+	    for (int k = 0; k < num_elements; k++) {
+	        int sentinal = 1 + 2 * (rand() % KEY_SIZE);
+	        elements[k] = sentinal;
+	        insert_node(&tree, sentinal);
+	        // printf("[%d] Inserted: %d\n", k,sentinal);
+	        scan_node(tree.root,false,0);
+	    }
+
+	    // Shuffle the elements array to get a random order
+	    shuffle_array(elements, num_elements);
+
+	    // Remove elements in random order
+	    for (int k = 0; k < num_elements; k++) {
+	        int sentinal = elements[k];
+	        Node* del_node = search_node(tree.root, sentinal);
+	        assert(!(del_node->is_nil));
+	        // Node* g = del_node->parent->parent;//successor(del_node)->parent->parent;
+	        // if(k==15){
+			// 	check_and_pretty_print_node(g,0);
+	        // }
+
+	        delete_node(&tree, del_node);
+	        // printf("[%d] Removed: %d\n",k, sentinal);
+	        
+	        // if(k==15){
+			// 	check_and_pretty_print_node(g,0);
+	        // }
+	        scan_node(tree.root,false,0);
+	    }
+
+	    assert(tree.root->is_nil);
+
+	    dinit_tree(&tree);
 	}
 }
 
@@ -87,7 +143,7 @@ void test_basic_insert(){
 	scan_node(tree.root,false,0);
 	
 	massive_insert(&tree,20);
-	check_and_pretty_print_node(tree.root,0);
+	// check_and_pretty_print_node(tree.root,0);
 	scan_node(tree.root,false,0);
 
 
@@ -101,5 +157,6 @@ int main(){
 
 	test_basic_insert();
 	test_massive_insert();
+	test_random_delete();
 	printf("ALL TESTS PASSED!!!!\n");
 }
