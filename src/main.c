@@ -150,13 +150,109 @@ void test_basic_insert(){
 	dinit_tree(&tree);
 }
 
+//GPT
+void test_specific_pattern() {
+    RBTree tree;
+    init_tree(&tree);
+
+    // Specific insertions to create the desired tree structure
+    insert_node(&tree, 20);   // Root (B)
+    insert_node(&tree, 10);   // Left child (R)
+    insert_node(&tree, 30);   // Right child (R)
+    insert_node(&tree, 5);    // Left-Left child (B)
+    insert_node(&tree, 15);   // Left-Right child (B)
+    insert_node(&tree, 25);   // Right-Left child (B)
+    insert_node(&tree, 35);   // Right-Right child (B)
+    insert_node(&tree, 3);    // Left-Left-Left child (R) -> Will delete to trigger fixup
+    insert_node(&tree, 7);    // Left-Left-Right child (R)
+    insert_node(&tree, 12);   // Left-Right-Left child (R)
+    insert_node(&tree, 17);   // Left-Right-Right child (R)
+
+    // Delete node 3 (red leaf) to trigger the scenario
+    Node* del_node = search_node(tree.root, 3);
+    if (!del_node->is_nil) {
+        delete_node(&tree, del_node);
+    }
+
+    // Validate tree structure and properties
+    scan_node(tree.root, false, 0);
+
+    dinit_tree(&tree);
+}
+
+void test_massive_random_oscillating() {
+    printf("testing massive random oscillating patterns\n");
+    RBTree tree;
+    int num_waves = 100;
+    int max_elements_per_wave = 10;
+    int total_elements = num_waves * max_elements_per_wave;
+    int elements[total_elements];
+    int element_count = 0;
+
+    for(int j=0;j<10;j++){
+
+	    init_tree(&tree);
+
+	    for (int wave = 0; wave < num_waves; wave++) {
+	        // Randomly determine the number of elements for this wave
+	        int num_elements = rand() % max_elements_per_wave;
+
+	        // Insert random elements into the tree
+	        for (int k = 0; k < num_elements; k++) {
+	            int sentinel = 2 * (rand() % KEY_SIZE);
+	            elements[element_count++] = sentinel;
+	            insert_node(&tree, sentinel);
+	        }
+
+	        // Shuffle the elements array to get a random order
+	        shuffle_array(elements, element_count);
+
+	        // Randomly determine how many elements to delete this wave
+	        int num_deletions = rand() % (element_count + 1);
+
+	        // Remove elements in random order
+	        for (int k = 0; k < num_deletions; k++) {
+	            int sentinel = elements[k];
+	            Node* del_node = search_node(tree.root, sentinel);
+	            if (!del_node->is_nil) {
+	                delete_node(&tree, del_node);
+	                elements[k] = elements[--element_count]; // Remove from array
+	            }
+	            scan_node(tree.root, false, 0); // Optional, for debugging
+	        }
+
+	        // Validate tree structure and properties
+	        scan_node(tree.root, false, 0);
+	    }
+
+	    // Final wave: Delete all remaining elements
+	    for (int k = 0; k < element_count; k++) {
+	        int sentinel = elements[k];
+	        Node* del_node = search_node(tree.root, sentinel);
+	        if (!del_node->is_nil) {
+	            delete_node(&tree, del_node);
+	        }
+	    }
+
+	    // Ensure tree is empty after all deletions
+	    assert(tree.root->is_nil);
+
+	    dinit_tree(&tree);
+	}
+}
+
+
+
 int main(){
 	// srand(37);
 	srand(23);
+	test_specific_pattern();
 	test_delete();
 
 	test_basic_insert();
 	test_massive_insert();
 	test_random_delete();
+
+	test_massive_random_oscillating();
 	printf("ALL TESTS PASSED!!!!\n");
 }

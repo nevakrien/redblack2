@@ -144,40 +144,6 @@ static void delete_fixup(RBTree* tree,Node* node){
 				left_rotate(tree,p);
 			}
 			continue;
-			// //we just need s to be the new parent
-			// if(s==p->right){
-			// 	left_rotate(tree,p);
-			// 	if(!p->left->is_nil){
-			// 		p->left->color='R';
-			// 		p->color='B';
-			// 		return;
-			// 	}
-			// 	else{
-			// 		ASSERT(!p->right->is_nil);
-			// 		p->right->color='R';
-			// 		p->color='B';
-			// 		return;
-
-			// 	}
-				
-			// }
-			// //we just need s to be the new parent
-			// if(s==p->left){
-			// 	right_rotate(tree,p);
-			// 	if(!p->left->is_nil){
-			// 		p->left->color='R';
-			// 		p->color='B';
-			// 		return;
-			// 	}
-			// 	else{
-			// 		ASSERT(!p->right->is_nil);
-			// 		p->right->color='R';
-			// 		p->color='B';
-			// 		return;
-
-			// 	}
-				
-			// }	
 		}
 
 		if(s->color=='B' && (s->left->color=='R' || s->right->color=='R')){
@@ -245,26 +211,6 @@ static void delete_fixup(RBTree* tree,Node* node){
 	node->color='B';
 }
 
-// static void delete_fixup(RBTree* tree,Node* node){
-// 	Node* p;
-// 	Node* s;
-// 	while(node->color=='B' && !node->parent->is_nil){
-// 		p=node->parent;
-// 		s=get_sibling(node);
-// 		if(s->is_nil){
-// 			node=node->parent;
-// 			continue;
-// 		}
-
-// 		if(s->color=='B' && (s->left->color=='R' || s->right->color=='R')){
-// 			Node* red_child=s->left->color=='R'? s->left : s->right;
-
-// 		}
-// 	}
-// 	node->color='B';
-// }
-
-// #include "debug.h"
 void delete_node(RBTree* tree,Node* node){
 	ASSERT(!node->is_nil);
 
