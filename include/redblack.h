@@ -9,7 +9,7 @@ void dinit_tree(RBTree* tree);//Y
 
 Node* search_node(Node* node,Data d); //Y
 Node* insert_node(RBTree* tree,Data d); //Y
-Node* delete_node(RBTree* tree,Node* node);
+void delete_node(RBTree* tree,Node* node);
 
 
 #endif // REDBLACK_H

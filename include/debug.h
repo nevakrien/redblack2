@@ -4,14 +4,14 @@
 #include "node.h"
 #include "stdbool.h"
 #include <stdio.h>
-
+#include "assert.h"
 // static inline void verify_binary(Node* node){
 // 	if(!node->left->is_nil){
-// 		ASSERT(compare(node->data,node->left->data)>=0);
+// 		assert(compare(node->data,node->left->data)>=0);
 // 		verify_binary(node->left);
 // 	}
 // 	if(!node->right->is_nil){
-// 		ASSERT(compare(node->right->data,node->data)>=0);
+// 		assert(compare(node->right->data,node->data)>=0);
 // 		verify_binary(node->right);
 // 	}
 // 	// printf("checked\n");
@@ -32,7 +32,7 @@ static void print_with_indent(const char* text, int indent) {
     for (int i = 0; i < indent; ++i) {
         printf("        ");
     }
-    printf(text);
+    printf("%s",text);
 }
 
 
@@ -43,13 +43,13 @@ static int scan_node(Node* node,bool print,int indent){
 		}\
 	
 	if(node->is_nil){
-		ASSERT(node->color=='B');
+		assert(node->color=='B');
 		PRINT("NIL\n");
 		return 1;
 	}
 
 	if(node->parent->is_nil){
-		ASSERT(node->color=='B');
+		assert(node->color=='B');
 	}
 
 	int blacks=0;
@@ -59,7 +59,7 @@ static int scan_node(Node* node,bool print,int indent){
 	if(node->color=='R'){
 		color="RED";
 		// PRINT("RED");
-		ASSERT('B'==node->right->color && 'B'==node->left->color);
+		assert('B'==node->right->color && 'B'==node->left->color);
 	}
 	else{
 		color="BLACK";
@@ -70,15 +70,15 @@ static int scan_node(Node* node,bool print,int indent){
 	
 
 	if(!node->right->is_nil){
-		ASSERT(node == node->right->parent);
+		assert(node == node->right->parent);
 		CMP c=compare(node->right->data,node->data);
-		ASSERT(c>=0);
+		assert(c>=0);
 	}
 
 	if(!node->left->is_nil){
-		ASSERT(node == node->left->parent);
+		assert(node == node->left->parent);
 		CMP c=compare(node->left->data,node->data);
-		ASSERT(c<=0);
+		assert(c<=0);
 	}
 
 	int left = scan_node(node->left,print,indent+1);
@@ -86,7 +86,7 @@ static int scan_node(Node* node,bool print,int indent){
 	if(print){printf("[%d]\n",node->data);}
 	int right = scan_node(node->right,print,indent+1);
 
-	ASSERT(left==right);
+	assert(left==right);
 
 	return blacks+left;
 

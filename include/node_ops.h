@@ -23,20 +23,19 @@ static Node* search_node(Node* node,Data d){
 }
 
 static inline Node* min_node( Node* node) {
-    while (node->left->is_nil) {
+    while (!node->left->is_nil) {
         node = node->left;
     }
     return node;
 }
 
 static inline Node* max_node(Node* node) {
-    while (node->right->is_nil) {
+    while (!node->right->is_nil) {
         node = node->right;
     }
     return node;
 }
 
-#include "debug.h"
 static inline void left_rotate(RBTree* tree, Node* x) {
     ASSERT(!x->right->is_nil);
     Node* y = x->right;

@@ -2,7 +2,7 @@
 # CC = $(shell which gcc-14 || echo gcc) #this is to get the best preformance
 # CXX =$(shell which g++-14 || echo g++) #clang fails... but nicer error messages
 CC = gcc
-Flags = -Wall -Wextra -Iinclude -g2 -fprofile-arcs -ftest-coverage #-fsanitize=address #-fopenmp
+Flags = -Wall -Wextra -Iinclude -g2 #-fprofile-arcs -ftest-coverage #-fsanitize=address #-fopenmp
 CFLAGS = $(Flags) -std=gnu99 
 
 # Directories
