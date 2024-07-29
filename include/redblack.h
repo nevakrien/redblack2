@@ -4,11 +4,11 @@
 #include "node.h"
 #include "node_ops.h"
 
-void init_tree(RBTree* tree);//Y
-void dinit_tree(RBTree* tree);//Y
+void init_tree(RBTree* tree);
+void dinit_tree(RBTree* tree);
 
-Node* search_node(Node* node,Data d); //Y
-Node* insert_node(RBTree* tree,Data d); //Y
+Node* search_node(Node* node,Data d); 
+Node* insert_node(RBTree* tree,Data d); 
 void delete_node(RBTree* tree,Node* node);
 
 

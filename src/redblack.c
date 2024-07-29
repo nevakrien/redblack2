@@ -151,8 +151,11 @@ static void delete_fixup(RBTree* tree,Node* node){
 			//that would break the loop
 		}
 		ASSERT(s->color=='B');
-		if(s->left->color=='B' && s->right->color=='B'){
-			// [[maybe_unused]]bool dump=likely(1);//this is because we get the hot loop
+		//the likely here is a hack 
+		//for forcing the compiler to optimize for this worse case
+		//since the only way this loop is anything more than 2 operations is here
+		//it may be the compiler figures this out. if it does remove the likely
+		if(likely(s->left->color=='B' && s->right->color=='B')){
 
 			//!printf("black sibling no children\n");
 			//now we know both children are black 
