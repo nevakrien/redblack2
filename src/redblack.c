@@ -12,7 +12,7 @@ static void insert_fixup(RBTree* tree,Node* node){
 		if(u->color=='R'){
 			u->color='B';
 			p->color='B';
-			if(g->parent->is_nil){
+			if(unlikely(g->parent->is_nil)){
 				return;
 			}
 			g->color='R';
@@ -60,7 +60,7 @@ static void insert_fixup(RBTree* tree,Node* node){
 
 Node* insert_node(RBTree* tree,Data d){
 	Node* node = make_node(tree,d);
-	if(tree->root->is_nil){
+	if(unlikely(tree->root->is_nil)){
 		tree->root=node;
 		node->color='B';
 		return node;
@@ -95,7 +95,7 @@ Node* insert_node(RBTree* tree,Data d){
 }
 
 static void replace_for_parent(RBTree* tree,Node* node,Node* t){
-	if(node->parent->is_nil){
+	if(unlikely(node->parent->is_nil)){
 		tree->root=t;
 	}
 	else if (node->parent->right==node){
@@ -125,7 +125,8 @@ static inline Node* get_sibling(Node* node){
 static void delete_fixup(RBTree* tree,Node* node){
 	Node* p;
 	Node* s;
-	while(node->color=='B' && !node->parent->is_nil){
+
+	while(node->color=='B' && !unlikely(node->parent->is_nil)){
 		p=node->parent;
 		s=get_sibling(node);
 		ASSERT(!s->is_nil); //node is black (no kids) so sibling must contain black level 2
@@ -143,69 +144,71 @@ static void delete_fixup(RBTree* tree,Node* node){
 			else{
 				left_rotate(tree,p);
 			}
-			continue;
+			s=get_sibling(node);
+			//this case never loops because:
+			//now S is black. IF we triger the BB case then
+			//we will do node=node->parent and since parent is red
+			//that would break the loop
 		}
+		ASSERT(s->color=='B');
+		if(s->left->color=='B' && s->right->color=='B'){
+			// [[maybe_unused]]bool dump=likely(1);//this is because we get the hot loop
 
-		if(s->color=='B' && (s->left->color=='R' || s->right->color=='R')){
-			//!printf("black sibling with red child:\n");
-			
-
-			//siblings children are either nil or red
-
-			if(s==p->right && s->right->color=='R'){
-				//this has a BUG
-				s->right->color='B';
-				s->color=p->color;
-				p->color='B';
-				left_rotate(tree,p);
-				ASSERT(p->parent==s);
-				return;
-			}
-
-			if(s==p->left && s->left->color=='R'){
-				//this has a BUG
-				s->left->color='B';
-				s->color=p->color;
-				p->color='B';
-				right_rotate(tree,p);
-				ASSERT(p->parent==s);
-				
-				return;
-			}
-
-			//!printf("complex case\n");
-			//siblings kid is oposite side to us
-
-			if(s==p->right && s->left->color=='R'){
-				s->left->color=p->color;
-				
-				right_rotate(tree,s);
-				left_rotate(tree,p);
-				p->color='B';
-				return;
-			}
-
-			if(s==p->left && s->right->color=='R'){
-				s->right->color=p->color;
-				left_rotate(tree,s);
-				right_rotate(tree,p);
-				p->color='B';
-				return;
-			}
-			UNREACHABLE();
-		}
-
-		if(s->color=='B'){
 			//!printf("black sibling no children\n");
-			// UNREACHABLE();
-			//now we know both children are black ie nil
+			//now we know both children are black 
 			s->color='R';
 			node=node->parent;
 			continue;
+			//this is the only case that actually loops
+			//as you can see its fairly specific
 		}
 
+		//loop wil now terminate
 
+		//!printf("black sibling with red child:\n");
+		//siblings children are either nil or red
 
+		if(s==p->right && s->right->color=='R'){
+			//this has a BUG
+			s->right->color='B';
+			s->color=p->color;
+			p->color='B';
+			left_rotate(tree,p);
+			ASSERT(p->parent==s);
+			return;
+		}
+
+		if(s==p->left && s->left->color=='R'){
+			//this has a BUG
+			s->left->color='B';
+			s->color=p->color;
+			p->color='B';
+			right_rotate(tree,p);
+			ASSERT(p->parent==s);
+			
+			return;
+		}
+
+		//!printf("complex case\n");
+		//siblings kid is oposite side to us
+
+		if(s==p->right && s->left->color=='R'){
+			s->left->color=p->color;
+			
+			right_rotate(tree,s);
+			left_rotate(tree,p);
+			p->color='B';
+			return;
+		}
+
+		if(s==p->left && s->right->color=='R'){
+			s->right->color=p->color;
+			left_rotate(tree,s);
+			right_rotate(tree,p);
+			p->color='B';
+			return;
+		}
+		
 		UNREACHABLE();
 	}
 	node->color='B';
@@ -215,7 +218,7 @@ void delete_node(RBTree* tree,Node* node){
 	ASSERT(!node->is_nil);
 
 
-	if((!node->right->is_nil) && (!node->left->is_nil)){
+	if(likely((!node->right->is_nil) && (!node->left->is_nil))){
 		
 		Node* s = successor(node);
 		//!printf("2 kids (suc is %d)\n",s->data);
@@ -245,7 +248,7 @@ void delete_node(RBTree* tree,Node* node){
 		}
 		else{
 			//!printf("black node\n");
-			node->is_nil=true;
+			// node->is_nil=true;
 			delete_fixup(tree,node);
 			replace_for_parent(tree,node,node->left);//node at left is nil
 		}

@@ -44,7 +44,7 @@ static inline void left_rotate(RBTree* tree, Node* x) {
         y->left->parent = x;
     }
     y->parent = x->parent;
-    if (x->parent->is_nil) {
+    if (unlikely(x->parent->is_nil)) {
         tree->root = y;
     } else if (x == x->parent->left) {
         x->parent->left = y;
@@ -63,7 +63,7 @@ static inline void right_rotate(RBTree* tree,Node* y) {
         x->right->parent = y;
     }
     x->parent = y->parent;
-    if (y->parent->is_nil) {
+    if (unlikely(y->parent->is_nil)) {
         tree->root = x;
     } else if (y == y->parent->right) {
         y->parent->right = x;

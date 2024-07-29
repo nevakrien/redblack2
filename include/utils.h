@@ -24,6 +24,8 @@
 
 #elif defined(__GNUC__) || defined(__clang__)
 #define UNREACHABLE() __builtin_unreachable()
+#define likely(x)       __builtin_expect((x),1)
+#define unlikely(x)     __builtin_expect((x),0)
 #elif defined(_MSC_VER)
 
 #define UNREACHABLE() __assume(0)
@@ -40,6 +42,11 @@ static inline void ASSERT(bool x){
     if(!x){UNREACHABLE();}
 }
 // #define ASSERT(x) if(!x){UNREACHABLE();}
+#endif
+
+#ifndef likely
+#define likely(x)
+#define unlikely(x) 
 #endif
 
 static inline void* null_check(void* p){
